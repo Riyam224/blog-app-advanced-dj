@@ -9,6 +9,6 @@ urlpatterns = [
     
     path('' , views.blog , name='blog'),
     path('search/' , views.search , name='search'),
-    path('post/<int:pk>/' , views.post , name='post_detail'),
+    path('<int:pk>/' , views.post , name='post_detail'),
     
 ]

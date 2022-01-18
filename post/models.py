@@ -5,6 +5,7 @@ from django.db import models
 
 from django.contrib.auth.models import User
 from django.utils.translation import gettext as _
+from django.urls import reverse
 
 
 class Author(models.Model):
@@ -47,6 +48,7 @@ class Post(models.Model):
     overview = models.TextField(_("overview"))
     timestamp = models.DateTimeField(_("timestamp"), auto_now_add=True)
     comment_count = models.IntegerField(_("comment count") , default=0)
+    view_count =  models.IntegerField(_("comment count") , default=0)
     author = models.ForeignKey(Author, verbose_name=_("author"), related_name='post_author', on_delete=models.CASCADE)
     thumbnail = models.ImageField(_("thumbnail"), upload_to='post/' , blank=True , null=True)
     category = models.ManyToManyField(Category, verbose_name=_("category"))
@@ -60,3 +62,9 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+
+    def get_absolute_url(self):
+        return reverse("post:post_detail", kwargs={"pk": self.pk})
+    
+

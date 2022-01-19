@@ -69,7 +69,9 @@ def post(request , pk):
     post = get_object_or_404(Post , pk=pk)
     
     # todo count vuew 
-    PostView.objects.get_or_create(user=request.user , post=post)
+    if request.user.is_authenticated:
+        
+        PostView.objects.get_or_create(user=request.user , post=post)
 
 
 

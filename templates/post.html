@@ -10,6 +10,7 @@
             <div class="post-single">
               <div class="post-thumbnail"><img src="{{ post.thumbnail.url }}" alt="..." class="img-fluid"></div>
               <div class="post-details">
+               <div class="container">
                 <div class="post-meta d-flex justify-content-between">
                   {% for cat in  post.category.all %}
 
@@ -20,6 +21,16 @@
                   {% endfor %}
                   
                 </div>
+                <div>
+                  <a class="btn btn-primary" href="{% url 'post:post_update'  post.pk %}">update</a>
+                  <a class="btn btn-danger" href="{% url 'post:post_delete'  post.pk %}">delete</a>
+                </div>
+               </div>
+
+               <br>
+               <br>
+               
+
                 <h1> {{ post.title }} <a href="#"><i class="fa fa-bookmark-o"></i></a></h1>
                 <div class="post-footer d-flex align-items-center flex-column flex-sm-row"><a href="#" class="author d-flex align-items-center flex-wrap">
                     <div class="avatar"><img src="{{ post.author.profile_img.url }}" alt="..." class="img-fluid"></div>

@@ -2,12 +2,19 @@
 from audioop import reverse
 from django.shortcuts import render , get_object_or_404, redirect , reverse
 from django.core.paginator import Paginator, EmptyPage , PageNotAnInteger
-from .models import Post
-from .forms import CommentForm
+from .models import Post , Author
+from .forms import CommentForm , PostForm
 from django.db.models import Count , Q
 
 
 # Create your views here.
+
+def get_author(user):
+    qs = Author.objects.filter(user=user)
+    if qs.exists():
+        return qs[0]
+    return None
+
 
 
 def search(request):
@@ -33,16 +40,15 @@ def blog(request):
     category_count = get_category_count()
     post_list = Post.objects.all()
     most_recent = Post.objects.order_by('-timestamp')[:3]
-    paginator = Paginator(post_list , 2)
+    paginator = Paginator(post_list , 3)
     page_request_var = 'page'
     page = request.GET.get(page_request_var)
 
     try:
         post_list  = paginator.page(page)
     except PageNotAnInteger:
-        post_list = paginator.page(2)
-    except EmptyPage:
-         post_list = paginator.page(paginator.num_pages)
+        post_list = paginator.page(paginator.num_pages)
+     
     
     context = {
         
@@ -81,3 +87,54 @@ def post(request , pk):
        
 
     })
+
+
+
+
+def post_create(request):
+    title = 'create'
+    form = PostForm(request.POST or None , request.FILES or None)
+    author = get_author(request.user)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.instance.author = author
+            form.save()
+            return redirect(reverse('post:post_detail' , kwargs = {
+             
+              'pk' : form.instance.pk
+            }))
+    
+    context = {
+        'form': form,
+        'title': title
+    }
+    return render(request , 'post_create.html' , context)
+
+
+
+def post_update(request, pk):
+    title = 'update'
+    post = get_object_or_404(Post , pk=pk)
+    form = PostForm(request.POST or None , request.FILES or None , instance=post)
+    author = get_author(request.user)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.instance.author = author
+            form.save()
+            return redirect(reverse('post:post_detail' , kwargs = {
+             
+              'pk' : form.instance.pk
+            }))
+    
+    context = {
+        'form': form,
+        'title': title
+    }
+    return render(request , 'post_create.html' , context)
+
+
+
+def post_delete(request , pk):
+    post = get_object_or_404(Post , pk=pk)
+    post.delete()
+    return redirect(reverse('post:blog'))

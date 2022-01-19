@@ -8,7 +8,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import gettext as _
 from django.urls import reverse
-from tinymce.models import HTMLField
 
 
 class Author(models.Model):
@@ -71,6 +70,11 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse("post:post_detail", kwargs={"pk": self.pk})
 
+    def get_update_url(self):
+        return reverse("post:post_update", kwargs={"pk": self.pk})
+        
+    def get_delete_url(self):
+        return reverse("post:post_delete", kwargs={"pk": self.pk})
 
     @property
     def get_comments(self):

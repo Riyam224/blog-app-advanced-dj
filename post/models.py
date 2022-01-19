@@ -1,13 +1,36 @@
 
-from ast import Str
+
 from django.db import models
-
-
-# Create your models here.
-
 from django.contrib.auth.models import User
 from django.utils.translation import gettext as _
 from django.urls import reverse
+
+
+
+class PostView(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey('Post', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user.username
+
+
+
+
+class Comment(models.Model):
+    post = models.ForeignKey('Post', verbose_name=_("post"), related_name='comments', on_delete=models.CASCADE)
+    user =  models.ForeignKey(User, verbose_name=_("user"), on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(_("timestamp"), auto_now_add=True)
+    content = models.TextField(_("content"))
+
+
+    class Meta:
+        verbose_name = _("Comment")
+        verbose_name_plural = _("Comments")
+
+    def __str__(self):
+        return str(self.user.username)
+
 
 
 class Author(models.Model):
@@ -50,8 +73,8 @@ class Post(models.Model):
     overview = models.TextField(_("overview"))
     content = models.TextField(_("content"))
     timestamp = models.DateTimeField(_("timestamp"), auto_now_add=True)
-    comment_count = models.IntegerField(_("comment count") , default=0)
-    view_count =  models.IntegerField(_("comment count") , default=0)
+  
+
     author = models.ForeignKey(Author, verbose_name=_("author"), related_name='post_author', on_delete=models.CASCADE)
     thumbnail = models.ImageField(_("thumbnail"), upload_to='post/' , blank=True , null=True)
     category = models.ManyToManyField(Category, verbose_name=_("category"))
@@ -80,20 +103,18 @@ class Post(models.Model):
     def get_comments(self):
         return self.comments.all().order_by('-timestamp')
     
+    @property
+    def comment_count(self):
+        return Comment.objects.filter(post=self).count()
+
+    
+    @property
+    def view_count(self):
+        return PostView.objects.filter(post=self).count()
 
 
      
 
-class Comment(models.Model):
-    post = models.ForeignKey(Post, verbose_name=_("post"), related_name='comments', on_delete=models.CASCADE)
-    user =  models.ForeignKey(User, verbose_name=_("user"), on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(_("timestamp"), auto_now_add=True)
-    content = models.TextField(_("content"))
 
 
-    class Meta:
-        verbose_name = _("Comment")
-        verbose_name_plural = _("Comments")
 
-    def __str__(self):
-        return str(self.user.username)

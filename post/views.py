@@ -2,7 +2,7 @@
 from audioop import reverse
 from django.shortcuts import render , get_object_or_404, redirect , reverse
 from django.core.paginator import Paginator, EmptyPage , PageNotAnInteger
-from .models import Post , Author
+from .models import Post , Author , PostView
 from .forms import CommentForm , PostForm
 from django.db.models import Count , Q
 
@@ -67,6 +67,12 @@ def post(request , pk):
     category_count = get_category_count()
     most_recent = Post.objects.order_by('-timestamp')[:3]
     post = get_object_or_404(Post , pk=pk)
+    
+    # todo count vuew 
+    PostView.objects.get_or_create(user=request.user , post=post)
+
+
+
     form = CommentForm(request.POST or None)
     if request.method == 'POST':
         if form.is_valid():
